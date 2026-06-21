@@ -1,0 +1,2874 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Linguo API",
+        "version": "0.1.0"
+    },
+    "paths": {
+        "/api/v1/auth/ping": {
+            "get": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Ping",
+                "operationId": "ping_api_v1_auth_ping_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "additionalProperties": true,
+                                    "type": "object",
+                                    "title": "Response Ping Api V1 Auth Ping Get"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not authenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "HTTP_401",
+                                        "message": "Not authenticated"
+                                    },
+                                    "time": "2026-02-20T15:30:54.651976"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Jwt is invalid or expired",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                },
+                                "example": {
+                                    "success": false,
+                                    "error": {
+                                        "code": "FORBIDDEN",
+                                        "message": "Jwt is invalid or expired"
+                                    },
+                                    "time": "2026-02-20T15:31:33.809360"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "User login",
+                "description": "Authenticate a user with email and password. Returns an access token in the response body and sets a httpOnly refresh token cookie.",
+                "operationId": "login_api_v1_auth_login_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AuthenticationRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authentication successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid email or password"
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "User logout",
+                "description": "Invalidates the refresh token stored in the httpOnly cookie and clears it. Returns 204 No Content regardless of whether the cookie was present.",
+                "operationId": "logout_api_v1_auth_logout_post",
+                "responses": {
+                    "204": {
+                        "description": "Successfully logged out"
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/refresh": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Refresh token rotation",
+                "description": "Rotates the refresh token: invalidates the current one, issues a new refresh token (set as httpOnly cookie) and returns a new access token in the response body. Requires a valid refresh token cookie.",
+                "operationId": "refresh_api_v1_auth_refresh_post",
+                "responses": {
+                    "200": {
+                        "description": "Tokens successfully refreshed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Refresh token is missing, invalid or expired"
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/register": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "User registration",
+                "description": "Register a new user",
+                "operationId": "register_api_v1_auth_register_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegistrationRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/reset-password": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Reset password",
+                "description": "Change password for the authenticated user after old password verification.",
+                "operationId": "reset_password_api_v1_auth_reset_password_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResetPasswordRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password successfully changed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResetPasswordResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Password validation failed"
+                    },
+                    "401": {
+                        "description": "Authentication required"
+                    },
+                    "403": {
+                        "description": "Old password is incorrect"
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/decks/recently-decks": {
+            "get": {
+                "tags": [
+                    "decks"
+                ],
+                "summary": "Get recently studied decks",
+                "description": "Returns up to 3 unique decks with the latest user study activity. Decks are sorted by the most recent review timestamp in descending order.",
+                "operationId": "get_recently_studied_decks_api_v1_decks_recently_decks_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RecentDecksResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/decks/decks/active": {
+            "get": {
+                "tags": [
+                    "decks"
+                ],
+                "summary": "Get Active Decks",
+                "operationId": "get_active_decks_api_v1_decks_decks_active_get",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "default": 1,
+                            "title": "Page"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeckListWithPagination"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/decks/{deck_id}": {
+            "get": {
+                "tags": [
+                    "decks"
+                ],
+                "summary": "Get a specific deck",
+                "description": "Retrieve detailed information about a specific deck belonging to the current user.\n\n        The deck is identified by its unique ID.  \n        Access is allowed only if the deck belongs to the authenticated user \n        or if the deck is public.",
+                "operationId": "get_specific_deck_api_v1_decks__deck_id__get",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "deck_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Deck Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DetailedDeckActionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "decks"
+                ],
+                "summary": "Deck update",
+                "description": "Partially updates a specific deck belonging to the current user.\n\n        Only the fields provided in the request body will be updated. \n        Fields that are not included will remain unchanged.\n\n        The deck must belong to the authenticated user, otherwise access will be denied.",
+                "operationId": "update_deck_api_v1_decks__deck_id__patch",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "deck_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Deck Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateDeckRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeckActionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "decks"
+                ],
+                "summary": "Deck delete",
+                "description": "Partially updates a specific deck belonging to the current user.\n\n        Only the fields provided in the request body will be updated. \n        Fields that are not included will remain unchanged.\n\n        The deck must belong to the authenticated user, otherwise access will be denied.",
+                "operationId": "delete_deck_api_v1_decks__deck_id__delete",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "deck_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Deck Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeckActionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/decks/": {
+            "get": {
+                "tags": [
+                    "decks"
+                ],
+                "summary": "Getting current user decks",
+                "description": "Retrieve a paginated list of decks created by the authenticated user.\n\n        Supports pagination via query parameters (e.g. page, size).  \n        Returns basic information about each deck along with pagination metadata.",
+                "operationId": "get_decks_api_v1_decks__get",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Filter decks by name (partial match)",
+                            "title": "Name"
+                        },
+                        "description": "Filter decks by name (partial match)"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "default": 1,
+                            "title": "Page"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeckListWithPagination"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "decks"
+                ],
+                "summary": "Deck Creation",
+                "description": "Creates a new deck for the authenticated user. The deck name must not be empty or contain only whitespace. Returns the created deck object with its generated ID and metadata.",
+                "operationId": "create_deck_api_v1_decks__post",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDeckRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeckActionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cards/{deck_id}": {
+            "post": {
+                "tags": [
+                    "cards"
+                ],
+                "summary": "Create Card",
+                "operationId": "create_card_api_v1_cards__deck_id__post",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "deck_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Deck Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Body_create_card_api_v1_cards__deck_id__post"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CardCreationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cards/{card_id}": {
+            "delete": {
+                "tags": [
+                    "cards"
+                ],
+                "summary": "Delete Card",
+                "operationId": "delete_card_api_v1_cards__card_id__delete",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "card_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Card Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "cards"
+                ],
+                "summary": "Update Card",
+                "operationId": "update_card_api_v1_cards__card_id__patch",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "card_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Card Id"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Body_update_card_api_v1_cards__card_id__patch"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CardUpdatingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "cards"
+                ],
+                "summary": "Change Card Deck",
+                "operationId": "change_card_deck_api_v1_cards__card_id__put",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "card_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Card Id"
+                        }
+                    },
+                    {
+                        "name": "new_deck_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "New Deck Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CardDeckChangingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "cards"
+                ],
+                "summary": "Get Card Details",
+                "operationId": "get_card_details_api_v1_cards__card_id__get",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "card_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Card Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CardViewResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cards/cards/{deck_id}/total": {
+            "get": {
+                "tags": [
+                    "cards"
+                ],
+                "summary": "Get Cards In Deck",
+                "operationId": "get_cards_in_deck_api_v1_cards_cards__deck_id__total_get",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "deck_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Deck Id"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "title": "Page"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "description": "Filter cards by term and definition (partial match)",
+                            "title": "Q"
+                        },
+                        "description": "Filter cards by term and definition (partial match)"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CardsListResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/cards/count-untouched/{deck_id}": {
+            "get": {
+                "tags": [
+                    "cards"
+                ],
+                "summary": "Count Untouched Cards In Deck",
+                "operationId": "count_untouched_cards_in_deck_api_v1_cards_count_untouched__deck_id__get",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "deck_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Deck Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CountUntouchedCardsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/files/{file_key}": {
+            "get": {
+                "tags": [
+                    "files"
+                ],
+                "summary": "Get a file by its key",
+                "description": "Retrieves a file by its storage key. The file key supports path separators (e.g. `IMAGE/uuid.jpeg`, `CARDS/SOUNDS/uuid.mpeg`). Returns raw file bytes with the original content type and filename preserved in the response headers.",
+                "operationId": "get_file_api_v1_files__file_key__get",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "file_key",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "File Key"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/profiles/": {
+            "patch": {
+                "tags": [
+                    "profiles"
+                ],
+                "summary": "Profile update",
+                "description": "Update the current user's profile fields.\n        All fields are optional — only provided fields will be updated.\n        - **username**: new display name\n        - **bio**: short text about the user\n        - **avatar**: image file (JPEG/PNG); replaces the existing avatar if present",
+                "operationId": "update_profile_api_v1_profiles__patch",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Body_update_profile_api_v1_profiles__patch"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProfileUpdatingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/profiles/me": {
+            "get": {
+                "tags": [
+                    "profiles"
+                ],
+                "summary": "Get user profile info",
+                "description": "Return the profile of the currently authenticated user.",
+                "operationId": "get_profile_api_v1_profiles_me_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProfileGettingResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/quizzes/get-next-question": {
+            "get": {
+                "tags": [
+                    "quizzes"
+                ],
+                "summary": "Get next question for deck",
+                "description": "takes out the most expired card from the users deck and builds a quiz question from it",
+                "operationId": "quizzes_api_v1_quizzes_get_next_question_get",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "deck_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Deck Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NextQuestion"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/quizzes/rate-question": {
+            "patch": {
+                "tags": [
+                    "quizzes"
+                ],
+                "summary": "Rate question after review",
+                "description": "Giving the user's answer after we have received the answer in get-next-question",
+                "operationId": "rate_question_api_v1_quizzes_rate_question_patch",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RatingRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseMessageResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/feedbacks": {
+            "post": {
+                "tags": [
+                    "feedbacks"
+                ],
+                "summary": "Create Feedback",
+                "description": "Create new user feedback.\n\nArgs:\n    request: Validated feedback data including message, type, and fill time.\n\nReturns:\n    Success confirmation with the created feedback ID.\n\nRaises:\n    401: If the user is not authenticated.",
+                "operationId": "create_feedback_api_v1_feedbacks_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateFeedbackRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BaseMessageResponse_str_"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "422": {
+                        "description": "Request validation error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AccessTokenResponse": {
+                "properties": {
+                    "access_token": {
+                        "type": "string",
+                        "title": "Access Token"
+                    },
+                    "token_type": {
+                        "type": "string",
+                        "title": "Token Type",
+                        "default": "bearer"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "access_token"
+                ],
+                "title": "AccessTokenResponse"
+            },
+            "AdditionalFieldView": {
+                "properties": {
+                    "type_": {
+                        "type": "string",
+                        "title": "Type"
+                    },
+                    "content": {
+                        "title": "Content"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "type_",
+                    "content"
+                ],
+                "title": "AdditionalFieldView",
+                "description": "Representation of a card's additional field (image, audio, context, synonyms)."
+            },
+            "AuthenticationRequest": {
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "format": "email",
+                        "title": "Email"
+                    },
+                    "password": {
+                        "type": "string",
+                        "title": "Password"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "title": "AuthenticationRequest"
+            },
+            "AuthenticationResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "Authentication successful"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/AccessTokenResponse"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "title": "AuthenticationResponse",
+                "description": "Response schema for successful login."
+            },
+            "BaseMessageResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {},
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Data"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "message"
+                ],
+                "title": "BaseMessageResponse",
+                "description": "Base response for successful operations."
+            },
+            "BaseMessageResponse_str_": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Data"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "message"
+                ],
+                "title": "BaseMessageResponse[str]"
+            },
+            "Body_create_card_api_v1_cards__deck_id__post": {
+                "properties": {
+                    "term": {
+                        "type": "string",
+                        "title": "Term"
+                    },
+                    "definition": {
+                        "type": "string",
+                        "title": "Definition"
+                    },
+                    "context": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Context"
+                    },
+                    "image": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "contentMediaType": "application/octet-stream"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image"
+                    },
+                    "audio": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "contentMediaType": "application/octet-stream"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Audio"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "term",
+                    "definition"
+                ],
+                "title": "Body_create_card_api_v1_cards__deck_id__post"
+            },
+            "Body_update_card_api_v1_cards__card_id__patch": {
+                "properties": {
+                    "term": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Term"
+                    },
+                    "definition": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Definition"
+                    },
+                    "context": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Context"
+                    },
+                    "image": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "contentMediaType": "application/octet-stream"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Image"
+                    },
+                    "audio": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "contentMediaType": "application/octet-stream"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Audio"
+                    }
+                },
+                "type": "object",
+                "title": "Body_update_card_api_v1_cards__card_id__patch"
+            },
+            "Body_update_profile_api_v1_profiles__patch": {
+                "properties": {
+                    "username": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Username"
+                    },
+                    "bio": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Bio"
+                    },
+                    "avatar": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "contentMediaType": "application/octet-stream"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Avatar"
+                    }
+                },
+                "type": "object",
+                "title": "Body_update_profile_api_v1_profiles__patch"
+            },
+            "CardCreationResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "Card created successfully"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/CardSimpleView"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "title": "CardCreationResponse",
+                "description": "Response schema for successful card creation."
+            },
+            "CardDeckChangingResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "Card moved to new deck successfully"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/CardSimpleView"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "title": "CardDeckChangingResponse",
+                "description": "Response schema for successful card deck changing."
+            },
+            "CardDetailedView": {
+                "properties": {
+                    "id_": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "term": {
+                        "type": "string",
+                        "title": "Term"
+                    },
+                    "def_": {
+                        "type": "string",
+                        "title": "Def"
+                    },
+                    "deck_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Deck Id"
+                    },
+                    "additional_fields": {
+                        "items": {
+                            "$ref": "#/components/schemas/AdditionalFieldView"
+                        },
+                        "type": "array",
+                        "title": "Additional Fields"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Updated At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id_",
+                    "term",
+                    "def_",
+                    "deck_id",
+                    "additional_fields",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "CardDetailedView",
+                "description": "Complete representation of a card with all additional fields."
+            },
+            "CardDetailedViewWithStats": {
+                "properties": {
+                    "id_": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "term": {
+                        "type": "string",
+                        "title": "Term"
+                    },
+                    "def_": {
+                        "type": "string",
+                        "title": "Def"
+                    },
+                    "deck_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Deck Id"
+                    },
+                    "additional_fields": {
+                        "items": {
+                            "$ref": "#/components/schemas/AdditionalFieldView"
+                        },
+                        "type": "array",
+                        "title": "Additional Fields"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Updated At"
+                    },
+                    "next_review": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Next Review"
+                    },
+                    "last_review": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Last Review"
+                    },
+                    "retrievability": {
+                        "type": "number",
+                        "title": "Retrievability"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id_",
+                    "term",
+                    "def_",
+                    "deck_id",
+                    "additional_fields",
+                    "created_at",
+                    "updated_at",
+                    "next_review",
+                    "last_review",
+                    "retrievability"
+                ],
+                "title": "CardDetailedViewWithStats",
+                "description": "Detailed representation of a card including review statistics."
+            },
+            "CardSimpleView": {
+                "properties": {
+                    "id_": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "term": {
+                        "type": "string",
+                        "title": "Term"
+                    },
+                    "def_": {
+                        "type": "string",
+                        "title": "Def"
+                    },
+                    "deck_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Deck Id"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id_",
+                    "term",
+                    "def_",
+                    "deck_id"
+                ],
+                "title": "CardSimpleView",
+                "description": "Simplified representation of a card."
+            },
+            "CardSimpleViewWithStats": {
+                "properties": {
+                    "id_": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "term": {
+                        "type": "string",
+                        "title": "Term"
+                    },
+                    "def_": {
+                        "type": "string",
+                        "title": "Def"
+                    },
+                    "deck_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Deck Id"
+                    },
+                    "next_review": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Next Review"
+                    },
+                    "last_review": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Last Review"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id_",
+                    "term",
+                    "def_",
+                    "deck_id",
+                    "next_review",
+                    "last_review",
+                    "created_at"
+                ],
+                "title": "CardSimpleViewWithStats",
+                "description": "Simplified representation of a card including review statistics."
+            },
+            "CardUpdatingResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "Card updated successfully"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/CardDetailedView"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "title": "CardUpdatingResponse",
+                "description": "Response schema for successful card updating."
+            },
+            "CardViewResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "Card retrieved successfully"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/CardDetailedViewWithStats"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "title": "CardViewResponse",
+                "description": "Response schema for retrieving a card's details with statistic."
+            },
+            "CardsListResponse": {
+                "properties": {
+                    "total": {
+                        "type": "integer",
+                        "title": "Total",
+                        "default": 0
+                    },
+                    "page": {
+                        "type": "integer",
+                        "title": "Page",
+                        "default": 1
+                    },
+                    "page_size": {
+                        "type": "integer",
+                        "title": "Page Size",
+                        "default": 10
+                    },
+                    "pages": {
+                        "type": "integer",
+                        "title": "Pages",
+                        "default": 0
+                    },
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "Cards retrieved successfully"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "$ref": "#/components/schemas/CardSimpleViewWithStats"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Data"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "title": "CardsListResponse",
+                "description": "Response schema for retrieving a list of cards."
+            },
+            "CountUntouchedCardsResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "Count of untouched cards retrieved successfully"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Data"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "title": "CountUntouchedCardsResponse",
+                "description": "Response schema for retrieving the count of untouched cards in a deck."
+            },
+            "CreateDeckRequest": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "maxLength": 256,
+                        "minLength": 1,
+                        "title": "Name"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 512
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "is_public": {
+                        "type": "boolean",
+                        "title": "Is Public",
+                        "default": false
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name"
+                ],
+                "title": "CreateDeckRequest"
+            },
+            "CreateFeedbackRequest": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "maxLength": 550,
+                        "minLength": 1,
+                        "title": "Message",
+                        "description": "The textual content of the user's feedback. Maximum 550 characters.",
+                        "examples": [
+                            "The checkout process was seamless and fast!"
+                        ]
+                    },
+                    "feedback_type": {
+                        "$ref": "#/components/schemas/FeedbackTypeDto"
+                    },
+                    "form_filled_time_ms": {
+                        "type": "integer",
+                        "exclusiveMinimum": 1,
+                        "title": "Form Filled Time Ms",
+                        "description": "Time taken to fill the form in milliseconds. Must be greater than 1."
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "message",
+                    "feedback_type",
+                    "form_filled_time_ms"
+                ],
+                "title": "CreateFeedbackRequest",
+                "description": "Request DTO for creating new user feedback.\n\nThis model validates and structures incoming feedback data from clients,\nensuring the message length, feedback type, and timing information meet\nthe API's requirements.\n\nAttributes:\n    message: The textual content of the user's feedback. Maximum 550 characters.\n    feedback_type: The category of feedback being submitted (bug, wish, or other).\n    form_filled_time_ms: The time taken by the user to fill out the feedback form\n        in milliseconds. Must be greater than 1.\n\nExample:\n    >>> request = CreateFeedbackRequest(\n    ...     message=\"The checkout process was seamless and fast!\",\n    ...     feedback_type=FeedbackTypeDto.WISH,\n    ...     form_filled_time_ms=1500\n    ... )"
+            },
+            "DeckActionResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/DeckSimpleView"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "message"
+                ],
+                "title": "DeckActionResponse",
+                "description": "Response schema for successful deck action."
+            },
+            "DeckDetailedView": {
+                "properties": {
+                    "id_": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Description"
+                    },
+                    "is_public": {
+                        "type": "boolean",
+                        "title": "Is Public"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Updated At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id_",
+                    "title",
+                    "description",
+                    "is_public",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "DeckDetailedView",
+                "description": "Complete representation of a deck with timestamps."
+            },
+            "DeckListWithPagination": {
+                "properties": {
+                    "data": {
+                        "items": {
+                            "$ref": "#/components/schemas/DeckWithStatsView"
+                        },
+                        "type": "array",
+                        "title": "Data"
+                    },
+                    "total_decks": {
+                        "type": "integer",
+                        "title": "Total Decks"
+                    },
+                    "current_page": {
+                        "type": "integer",
+                        "title": "Current Page"
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "title": "Per Page"
+                    },
+                    "pages": {
+                        "type": "integer",
+                        "title": "Pages"
+                    },
+                    "has_next": {
+                        "type": "boolean",
+                        "title": "Has Next"
+                    },
+                    "has_previous": {
+                        "type": "boolean",
+                        "title": "Has Previous"
+                    },
+                    "next_page": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Next Page"
+                    },
+                    "previous_page": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Previous Page"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "data",
+                    "total_decks",
+                    "current_page",
+                    "per_page",
+                    "pages",
+                    "has_next",
+                    "has_previous",
+                    "next_page",
+                    "previous_page"
+                ],
+                "title": "DeckListWithPagination"
+            },
+            "DeckSimpleView": {
+                "properties": {
+                    "id_": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Description"
+                    },
+                    "is_public": {
+                        "type": "boolean",
+                        "title": "Is Public"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id_",
+                    "title",
+                    "description",
+                    "is_public"
+                ],
+                "title": "DeckSimpleView",
+                "description": "Simplified representation of a deck."
+            },
+            "DeckWithStatsView": {
+                "properties": {
+                    "id_": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "title": {
+                        "type": "string",
+                        "title": "Title"
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Description"
+                    },
+                    "is_public": {
+                        "type": "boolean",
+                        "title": "Is Public"
+                    },
+                    "total_cards": {
+                        "type": "integer",
+                        "title": "Total Cards"
+                    },
+                    "cards_to_learn": {
+                        "type": "integer",
+                        "title": "Cards To Learn"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id_",
+                    "title",
+                    "description",
+                    "is_public",
+                    "total_cards",
+                    "cards_to_learn"
+                ],
+                "title": "DeckWithStatsView",
+                "description": "Deck representation for list endpoints with card statistics."
+            },
+            "DetailedDeckActionResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/DeckDetailedView"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "message"
+                ],
+                "title": "DetailedDeckActionResponse",
+                "description": "Response schema for successful detailed deck action."
+            },
+            "ErrorDetail": {
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "title": "Code",
+                        "description": "Machine-readable error code (e.g. USER_NOT_FOUND).",
+                        "examples": [
+                            {
+                                "AuthErrorCodes": {
+                                    "EMAIL_OR_PASSWORD_INCORRECT": "EMAIL_OR_PASSWORD_INCORRECT",
+                                    "FORBIDDEN": "FORBIDDEN",
+                                    "INVALID_OLD_PASSWORD": "INVALID_OLD_PASSWORD",
+                                    "INVALID_OR_EXPIRED_REFRESH_TOKEN": "INVALID_OR_EXPIRED_REFRESH_TOKEN",
+                                    "NEW_PASSWORD_MUST_DIFFER": "NEW_PASSWORD_MUST_DIFFER"
+                                },
+                                "BaseErrorCodes": {
+                                    "INVALID_FILTER": "INVALID_FILTER",
+                                    "INVALID_PAGINATION": "INVALID_PAGINATION",
+                                    "PERMISSION_DENIED": "PERMISSION_DENIED",
+                                    "RESOURCE_NOT_FOUND": "RESOURCE_NOT_FOUND"
+                                },
+                                "CardErrorCodes": {
+                                    "CARD_NOT_FOUND": "CARD_NOT_FOUND",
+                                    "INVALID_FIELD": "INVALID_FIELD",
+                                    "INVALID_FILE_TYPE": "INVALID_FILE_TYPE"
+                                },
+                                "DeckErrorCodes": {
+                                    "DECK_ALREADY_EXISTS": "DECK_ALREADY_EXISTS",
+                                    "DECK_BELONGS_TO_ANOTHER_USER": "DECK_BELONGS_TO_ANOTHER_USER",
+                                    "DECK_NOT_FOUND": "DECK_NOT_FOUND",
+                                    "INVALID_DECK_NAME": "INVALID_DECK_NAME"
+                                },
+                                "FilesErrorCodes": {
+                                    "FILE_ACCESS_DENIED": "FILE_ACCESS_DENIED",
+                                    "FILE_ALREADY_EXISTS": "FILE_ALREADY_EXISTS",
+                                    "FILE_BELONGS_TO_ANOTHER_USER": "FILE_BELONGS_TO_ANOTHER_USER",
+                                    "FILE_DELETE_FAILED": "FILE_DELETE_FAILED",
+                                    "FILE_NOT_FOUND": "FILE_NOT_FOUND",
+                                    "FILE_TOO_LARGE": "FILE_TOO_LARGE",
+                                    "FILE_UPLOAD_FAILED": "FILE_UPLOAD_FAILED",
+                                    "INVALID_FILE_TYPE": "INVALID_FILE_TYPE"
+                                },
+                                "ProfilesErrorCodes": {
+                                    "BIO_MUST_BE_AT_MOST_300_CHARACTERS": "BIO_MUST_BE_AT_MOST_300_CHARACTERS",
+                                    "PROFILE_NOT_FOUND": "PROFILE_NOT_FOUND",
+                                    "USERNAME_ALREADY_IN_USE": "USERNAME_ALREADY_IN_USE",
+                                    "USERNAME_MUST_BE_BETWEEN_3_AND_50_CHARACTERS": "USERNAME_MUST_BE_BETWEEN_3_AND_50_CHARACTERS"
+                                },
+                                "QuizErrorCodes": {
+                                    "ALL_FIELDS_ARE_EXCLUDED": "ALL_FIELDS_ARE_EXCLUDED",
+                                    "AT_LEAST_ONE_INPUT_TYPE_MUST_BE_AVAILABLE": "AT_LEAST_ONE_INPUT_TYPE_MUST_BE_AVAILABLE",
+                                    "AT_LEAST_ONE_PRESENTATION_TYPE_MUST_BE_AVAILABLE": "AT_LEAST_ONE_INPUT_TYPE_MUST_BE_AVAILABLE",
+                                    "IMAGE_DOES_NOT_EXIST_FOR_CARD": "IMAGE_DOES_NOT_EXIST_FOR_CARD",
+                                    "INVALID_FIELD_TYPE": "INVALID_FIELD_TYPE",
+                                    "INVALID_RATING": "INVALID_RATING",
+                                    "NO_COMPATIBLE_COMBINATIONS_FOUND": "NO_COMPATIBLE_COMBINATIONS_FOUND",
+                                    "SOUND_DOES_NOT_EXIST_FOR_CARD": "SOUND_DOES_NOT_EXIST_FOR_CARD",
+                                    "THERE_IS_NO_CARD_TO_REVIEW": "THERE_IS_NO_CARD_TO_REVIEW"
+                                },
+                                "UserErrorCodes": {
+                                    "EMAIL_ALREADY_IN_USE": "EMAIL_ALREADY_IN_USE",
+                                    "USER_NOT_FOUND": "USER_NOT_FOUND"
+                                }
+                            }
+                        ]
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "description": "Human-readable description of the error.",
+                        "examples": [
+                            "User with this email not found"
+                        ]
+                    },
+                    "details": {
+                        "title": "Details",
+                        "description": "Optional structured payload with additional context (e.g. validation field errors)."
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "code",
+                    "message"
+                ],
+                "title": "ErrorDetail",
+                "description": "Inner object that describes what went wrong."
+            },
+            "ErrorResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": false
+                    },
+                    "error": {
+                        "$ref": "#/components/schemas/ErrorDetail"
+                    },
+                    "time": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Time",
+                        "description": "Timestamp of when the error occurred (ISO 8601 format)."
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "error"
+                ],
+                "title": "ErrorResponse"
+            },
+            "FeedbackTypeDto": {
+                "type": "string",
+                "enum": [
+                    "bug",
+                    "wish",
+                    "other"
+                ],
+                "title": "FeedbackTypeDto",
+                "description": "Enumeration of supported feedback categories.\n\nAttributes:\n    BUG: Indicates a bug report or technical issue.\n    WISH: Indicates a feature request or suggestion.\n    OTHER: Indicates feedback that does not fall into the other categories."
+            },
+            "InputContent": {
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/InputTypeDTO"
+                    },
+                    "content": {
+                        "additionalProperties": true,
+                        "type": "object",
+                        "title": "Content"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "type",
+                    "content"
+                ],
+                "title": "InputContent"
+            },
+            "InputContext": {
+                "properties": {
+                    "correct_answer": {
+                        "type": "string",
+                        "title": "Correct Answer"
+                    },
+                    "content": {
+                        "$ref": "#/components/schemas/InputContent"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "correct_answer",
+                    "content"
+                ],
+                "title": "InputContext"
+            },
+            "InputTypeDTO": {
+                "type": "string",
+                "enum": [
+                    "typing",
+                    "multiple_choice",
+                    "flash_card",
+                    "true_false"
+                ],
+                "title": "InputTypeDTO",
+                "description": "A separate layer for services in order to remove\nthe dependency of the presentation layer and the domain layer"
+            },
+            "NextQuestion": {
+                "properties": {
+                    "review_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Review Id"
+                    },
+                    "question": {
+                        "$ref": "#/components/schemas/Question"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "review_id",
+                    "question"
+                ],
+                "title": "NextQuestion"
+            },
+            "PresentationContext": {
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/PresentationTypeDTO"
+                    },
+                    "content": {
+                        "type": "string",
+                        "title": "Content"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "type",
+                    "content"
+                ],
+                "title": "PresentationContext"
+            },
+            "PresentationTypeDTO": {
+                "type": "string",
+                "enum": [
+                    "cloze",
+                    "image",
+                    "sound",
+                    "definition"
+                ],
+                "title": "PresentationTypeDTO"
+            },
+            "ProfileGettingResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "Profile recieved successfully"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/ProfileSimpleView"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "title": "ProfileGettingResponse",
+                "description": "Response schema for successful profile getting"
+            },
+            "ProfileSimpleView": {
+                "properties": {
+                    "profile_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Profile Id"
+                    },
+                    "username": {
+                        "type": "string",
+                        "title": "Username"
+                    },
+                    "bio": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Bio"
+                    },
+                    "avatar_file_key": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Avatar File Key"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "profile_id",
+                    "username",
+                    "bio",
+                    "avatar_file_key"
+                ],
+                "title": "ProfileSimpleView"
+            },
+            "ProfileUpdatingResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "Profile updated successfully"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/ProfileSimpleView"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "title": "ProfileUpdatingResponse",
+                "description": "Response schema for successful profile updating."
+            },
+            "Question": {
+                "properties": {
+                    "presentation": {
+                        "$ref": "#/components/schemas/PresentationContext"
+                    },
+                    "input": {
+                        "$ref": "#/components/schemas/InputContext"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "presentation",
+                    "input"
+                ],
+                "title": "Question"
+            },
+            "Rating": {
+                "type": "integer",
+                "enum": [
+                    1,
+                    2,
+                    3
+                ],
+                "title": "Rating",
+                "description": "AGAIN == Не знаю | Don't know: 1\nHARD == Знаю с трудом | I hardly know: 2\nGOOD == Знаю | I know.: 3"
+            },
+            "RatingRequest": {
+                "properties": {
+                    "review_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Review Id"
+                    },
+                    "rating": {
+                        "$ref": "#/components/schemas/Rating"
+                    },
+                    "review_date_time": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Review Date Time"
+                    },
+                    "review_duration": {
+                        "type": "integer",
+                        "title": "Review Duration"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "review_id",
+                    "rating",
+                    "review_date_time",
+                    "review_duration"
+                ],
+                "title": "RatingRequest",
+                "description": "review_id: UUID: The uuid that was retrieved in /get-next-question\nrating: Rating: The rating that was given during the answer\nreview_date_time: datetime: The date and time the rating was given. Must be in UTC.\nreview_duration: int: Time in which the user gave an answer in milliseconds"
+            },
+            "RecentDecksResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "items": {
+                                    "$ref": "#/components/schemas/DeckSimpleView"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Data"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "message"
+                ],
+                "title": "RecentDecksResponse",
+                "description": "Response schema for recently studied decks."
+            },
+            "RegistrationRequest": {
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "maxLength": 255,
+                        "format": "email",
+                        "title": "Email"
+                    },
+                    "password": {
+                        "type": "string",
+                        "title": "Password"
+                    },
+                    "username": {
+                        "type": "string",
+                        "maxLength": 55,
+                        "minLength": 3,
+                        "title": "Username"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "email",
+                    "password",
+                    "username"
+                ],
+                "title": "RegistrationRequest"
+            },
+            "ResetPasswordRequest": {
+                "properties": {
+                    "old_password": {
+                        "type": "string",
+                        "title": "Old Password"
+                    },
+                    "new_password": {
+                        "type": "string",
+                        "title": "New Password"
+                    },
+                    "confirmed_password": {
+                        "type": "string",
+                        "title": "Confirmed Password"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "old_password",
+                    "new_password",
+                    "confirmed_password"
+                ],
+                "title": "ResetPasswordRequest"
+            },
+            "ResetPasswordResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "default": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "default": "Password has been reset successfully"
+                    },
+                    "data": {
+                        "anyOf": [
+                            {
+                                "additionalProperties": true,
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Data"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Timestamp"
+                    }
+                },
+                "type": "object",
+                "title": "ResetPasswordResponse",
+                "description": "Response schema for successful password reset."
+            },
+            "UpdateDeckRequest": {
+                "properties": {
+                    "name": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 256
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Name"
+                    },
+                    "description": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 512
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Description"
+                    },
+                    "is_public": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Is Public"
+                    }
+                },
+                "type": "object",
+                "title": "UpdateDeckRequest"
+            }
+        },
+        "securitySchemes": {
+            "HTTPBearer": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        }
+    }
+}

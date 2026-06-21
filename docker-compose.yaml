@@ -1,0 +1,127 @@
+services:
+  api:
+    build: .
+    container_name: api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+    command: /app/commands/start-prod.sh
+    networks:
+      - linguo-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "${API_CPU_LIMIT}"
+          memory: ${API_MEMORY_LIMIT}
+        reservations:
+          cpus: "${API_CPU_RESERVATION}"
+          memory: ${API_MEMORY_RESERVATION}
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/${NGINX_CONF_FOLDER}:/etc/nginx/conf.d:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    depends_on:
+      - api
+    networks:
+      - linguo-network
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/www/certbot:/var/www/certbot
+    entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew --quiet; sleep 12h & wait $${!}; done"
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: linguo-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5454:5432"
+    volumes:
+      - postgres_savoria:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 3
+    networks:
+      - linguo-network
+    deploy:
+      resources:
+        limits:
+          cpus: "${POSTGRES_CPU_LIMIT}"
+          memory: ${POSTGRES_MEMORY_LIMIT}
+        reservations:
+          cpus: "${POSTGRES_CPU_RESERVATION}"
+          memory: ${POSTGRES_MEMORY_RESERVATION}
+
+  s3:
+    image: quay.io/minio/minio:latest
+    container_name: s3
+    environment:
+      MINIO_ROOT_USER: ${S3_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${S3_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: ["server", "--console-address", ":9001", "/data"]
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - linguo-network
+
+  minio-init:
+    image: quay.io/minio/mc:latest
+    container_name: minio-init
+    restart: on-failure
+    depends_on:
+      s3:
+        condition: service_healthy
+    environment:
+      S3_ROOT_USER: ${S3_ROOT_USER}
+      S3_ROOT_PASSWORD: ${S3_ROOT_PASSWORD}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+    entrypoint:
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://s3:9000 ${S3_ROOT_USER} ${S3_ROOT_PASSWORD};
+      /usr/bin/mc mb myminio/${S3_BUCKET_NAME} --ignore-existing;
+      /usr/bin/mc anonymous set private myminio/${S3_BUCKET_NAME};
+      /usr/bin/mc admin user add myminio ${S3_ACCESS_KEY} ${S3_SECRET_KEY};
+      /usr/bin/mc admin policy attach myminio readwrite --user ${S3_ACCESS_KEY};
+      "
+    networks:
+      - linguo-network
+
+volumes:
+  postgres_savoria: {}
+  minio_data: {}
+
+networks:
+  linguo-network:
+    driver: bridge

@@ -1,0 +1,6 @@
+from enum import Enum
+
+class ExternalAPIErrorCodes(Enum):
+    CLIENT_ERROR = "EXTERNAL_API__CLIENT_ERROR"
+    UNAVAILABLE = "EXTERNAL_API__UNAVAILABLE"
+    NOT_FOUND = "EXTERNAL_API_NOT_FOUND"
